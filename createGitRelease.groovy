@@ -10,11 +10,22 @@ def strReleaseBranchName = "release/r$strBuildNumber"
 def strTagName = "R$strBuildNumber"
 def strOriginRemote = "origin"
 def strReleaseRemote = "release"
-def strIntermediateRepoPath = build.getWorkspace().toURI()
+def strWorkspacePath = build.getWorkspace().toURI()
 
-println "\norigin branch: $strOriginBranchName\nrelease branch: $strReleaseBranchName\ntag: $strTagName\nintermediate repo: $strIntermediateRepoPath\n"
+def workingDir = new File(strWorkspacePath)
+def mainRepoDirPath = build.getWorkspace().getRemote() + "/main-1/"
+def mainRepoDir = new File(mainRepoDirPath)
 
-def workingDir = new File(strIntermediateRepoPath)
+def mainRepoURL = "https://github.com/crlenz/main-1.git"
+def releaseRepoURL = "https://crlenz:system123@github.com/crlenz/release-1.git"
+
+println "\nmainRepoURL: $mainRepoURL"
+println "releaseRepoURL: $releaseRepoURL"
+println "workspace: $strWorkspacePath"
+println "mainRepoDir: $mainRepoDirPath"
+println "origin branch: $strOriginBranchName"
+println "release branch: $strReleaseBranchName"
+println "tag: $strTagName\n"
 
 def execCommand(command, workingDir) {
   println "\ncommand to execute: $command"
@@ -24,20 +35,25 @@ def execCommand(command, workingDir) {
   println "   exitValue: ${process.exitValue()}\n   text: ${process.text}\n   err.text: ${process.err.text}"
 }
 
-execCommand("git checkout master", workingDir)
-execCommand("git pull $strOriginRemote $strOriginBranchName", workingDir)
+execCommand("rm -rf main-1", workingDir)
+execCommand("git clone $mainRepoURL", workingDir)
 
-execCommand("git branch $strReleaseBranchName", workingDir)
-execCommand("git tag $strTagName", workingDir)
+execCommand("git checkout master", mainRepoDir)
 
-execCommand("git remote add release 'git@github.com:crlenz/release-1.git'", workingDir)
-execCommand("git remote set-url release 'git@github.com:crlenz/release-1.git'", workingDir)
+execCommand("git branch $strReleaseBranchName", mainRepoDir)
+execCommand("git tag $strTagName", mainRepoDir)
 
-execCommand("git push $strReleaseRemote $strReleaseBranchName", workingDir)
-execCommand("git push $strReleaseRemote $strTagName", workingDir)
+execCommand("git remote add release $releaseRepoURL", mainRepoDir)
+execCommand("git remote set-url release $releaseRepoURL", mainRepoDir)
+
+execCommand("git push $strReleaseRemote $strReleaseBranchName", mainRepoDir)
+execCommand("git push $strReleaseRemote $strTagName", mainRepoDir)
 
 // end ****************************************************
 
+//execCommand("git pull $strOriginRemote $strOriginBranchName", workingDir)
+//def releaseRepoURL = "crlenz:system123@github.com:crlenz/release-1.git"
+//def releaseRepoURL = "git@github.com:crlenz/release-1.git"
 //def strOriginBranchName = build.buildVariableResolver.resolve("Origin Branch Name")
 //def strReleaseBranchName = "release/$strOriginBranchName"
 //def strTagName = strOriginBranchName.toUpperCase()
