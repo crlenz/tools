@@ -23,13 +23,13 @@ def execCommand(command, workingDir) {
   process.waitFor()
   println "   exitValue: ${process.exitValue()}\n   text: ${process.text}\n   err.text: ${process.err.text}"
 }
+
 execCommand("git checkout master", workingDir)
 execCommand("git pull $strOriginRemote $strOriginBranchName", workingDir)
 
 execCommand("git branch $strReleaseBranchName", workingDir)
 execCommand("git tag $strTagName", workingDir)
 
-execCommand("git remote add release 'https://jenkins-crlenz:system123@github.com/crlenz/release-1.git'", workingDir)
 execCommand("git remote add release 'git@github.com:crlenz/release-1.git'", workingDir)
 execCommand("git remote set-url release 'git@github.com:crlenz/release-1.git'", workingDir)
 
@@ -43,3 +43,4 @@ execCommand("git push $strReleaseRemote $strTagName", workingDir)
 //def strTagName = strOriginBranchName.toUpperCase()
 //def strIntermediateRepoPath = "/home/admin/git/main-1/"
 //def strIntermediateRepoPath = "/var/lib/jenkins/jobs/freestyle-git-release/workspace"
+//execCommand("git remote add release 'https://jenkins-crlenz:system123@github.com/crlenz/release-1.git'", workingDir)
